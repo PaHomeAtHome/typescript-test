@@ -1,91 +1,55 @@
-let age: number;
-age = 50;
-let name1: string;
-name1 = "Max";
-let toggle: boolean;
-toggle = true;
-let empty: null;
-empty = null;
-let notInitialize: undefined;
-notInitialize = undefined;
-
-let callback: (a: number) => number;
-callback = (a) => {
-  return 100 + a;
-};
-
-let anything: any;
-anything = -20;
-anything = "Text";
-anything = {};
-
-let some: unknown;
-some = "Text";
-let str: string;
-if (typeof some === "string") {
-  str = some;
+class Key {
+  signature: number;
+  constructor() {
+    this.signature = Math.random();
+  }
+  getSignature(): number {
+    return this.signature;
+  }
 }
 
-let person: [string, number];
-person = ["Max", 21];
+class Person {
+  key: number;
+  constructor(key: number) {
+    this.key = key;
+  }
 
-enum Load {
-  LOADING,
-  READY,
+  getKey(): number {
+    return this.key;
+  }
 }
 
-const page = {
-  load: Load.READY,
-};
+abstract class House {
+  public door = "closed";
+  key: number;
+  tenants: Person[] = [];
 
-if (page.load === Load.LOADING) {
-  console.log("Страница загружается");
-}
-if (page.load === Load.READY) {
-  console.log("Страница загружена");
-}
+  constructor(key: number) {
+    this.key = key;
+  }
 
-let union: string | number;
+  comein(person: Person) {
+    if (this.door === "open") {
+      this.tenants.push(person);
+    }
+  }
 
-let literal: "enable" | "disable";
-
-function showMessage(message: string): void {
-  console.log(message);
-}
-
-function calc(num1: number, num2: number): number {
-  return num1 + num2;
+  abstract openDoor(key: number): void;
 }
 
-function customError(): never {
-  throw new Error("Error");
+class MyHouse extends House {
+  public openDoor(key: number) {
+    if (key === this.key) {
+      this.door = "open";
+    }
+  }
 }
 
-type CustomType = {
-  title: string;
-  likes: number;
-  accounts: string[];
-  status: "open" | "close";
-  details?: {
-    createAt: string;
-    updateAt: string;
-  };
-};
+const createdKey = new Key();
+const key = createdKey.getSignature();
+const person = new Person(key);
+const house = new MyHouse(key);
+house.openDoor(key);
+house.comein(person);
 
-const page1: CustomType = {
-  title: "The awesome page",
-  likes: 100,
-  accounts: ["Max", "Anton", "Nikita"],
-  status: "open",
-  details: {
-    createAt: "2021-01-01",
-    updateAt: "2021-05-01",
-  },
-};
-
-const page2: CustomType = {
-  title: "Python or Js",
-  likes: 5,
-  accounts: ["Alex"],
-  status: "close",
-};
+console.log(house.tenants);

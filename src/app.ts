@@ -1,55 +1,47 @@
-class Key {
-  signature: number;
-  constructor() {
-    this.signature = Math.random();
-  }
-  getSignature(): number {
-    return this.signature;
-  }
+function getPromise() {
+  const promise: Promise<(string | number)[]> = new Promise((resolve) => {
+    resolve(["Text", 50]);
+  });
+  return promise;
 }
 
-class Person {
-  key: number;
-  constructor(key: number) {
-    this.key = key;
-  }
+getPromise().then((data) => {
+  console.log(data);
+});
 
-  getKey(): number {
-    return this.key;
-  }
+type AllType = {
+  name: string;
+  position: number;
+  color: string;
+  weight: number;
+};
+
+function compare(
+  top: Pick<AllType, "name" | "color">,
+  bottom: Pick<AllType, "position" | "weight">
+): AllType {
+  return {
+    name: top.name,
+    color: top.color,
+    position: bottom.position,
+    weight: bottom.weight,
+  };
 }
 
-abstract class House {
-  public door = "closed";
-  key: number;
-  tenants: Person[] = [];
-
-  constructor(key: number) {
-    this.key = key;
-  }
-
-  comein(person: Person) {
-    if (this.door === "open") {
-      this.tenants.push(person);
-    }
-  }
-
-  abstract openDoor(key: number): void;
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  return Object.assign(objA, objB);
 }
 
-class MyHouse extends House {
-  public openDoor(key: number) {
-    if (key === this.key) {
-      this.door = "open";
-    }
-  }
+class Component<T> {
+  constructor(public props: T) {}
 }
 
-const createdKey = new Key();
-const key = createdKey.getSignature();
-const person = new Person(key);
-const house = new MyHouse(key);
-house.openDoor(key);
-house.comein(person);
+interface rsada {
+  title: string;
+}
 
-console.log(house.tenants);
+class Page extends Component<rsada> {
+  pageInfo() {
+    console.log(this.props.title);
+  }
+}

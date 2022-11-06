@@ -1,47 +1,50 @@
-function getPromise() {
-  const promise: Promise<(string | number)[]> = new Promise((resolve) => {
-    resolve(["Text", 50]);
+function Check(target: any, nameMethod: string, position: number) {
+  if (!target[nameMethod].validation) {
+    target[nameMethod].validation = {};
+  }
+  Object.assign(target[nameMethod].validation, {
+    [position]: (value: string) => {
+      if (value.includes("@")) {
+        throw new Error("Get it off of me");
+      }
+      return value;
+    },
   });
-  return promise;
 }
 
-getPromise().then((data) => {
-  console.log(data);
-});
+function Validation(
+  _: any,
+  __: string,
+  descriptor: PropertyDescriptor
+): PropertyDescriptor {
+  const method = descriptor.value;
 
-type AllType = {
-  name: string;
-  position: number;
-  color: string;
-  weight: number;
-};
-
-function compare(
-  top: Pick<AllType, "name" | "color">,
-  bottom: Pick<AllType, "position" | "weight">
-): AllType {
   return {
-    name: top.name,
-    color: top.color,
-    position: bottom.position,
-    weight: bottom.weight,
+    configurable: true,
+    enumerable: false,
+    get() {
+      return (...args: any[]) => {
+        if (method.validation) {
+          args.forEach((elem, index) => {
+            if (method.validation[index]) {
+              args[index] = method.validation[index](elem);
+            }
+          });
+        }
+        return method.apply(this, args);
+      };
+    },
   };
 }
 
-function merge<T extends object, U extends object>(objA: T, objB: U) {
-  return Object.assign(objA, objB);
-}
-
-class Component<T> {
-  constructor(public props: T) {}
-}
-
-interface rsada {
-  title: string;
-}
-
-class Page extends Component<rsada> {
-  pageInfo() {
-    console.log(this.props.title);
+class Test {
+  public something: string = "sad";
+  @Validation
+  setSomething(@Check something: string) {
+    this.something = something;
+    console.log(something);
   }
 }
+
+const test = new Test();
+test.setSomething("email");
